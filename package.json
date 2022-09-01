@@ -7,6 +7,7 @@
     "lib"
   ],
   "scripts": {
+    "prebuild": "rm -rf ./lib",
     "build": "tsc --project tsconfig.dev.json",
     "ci": "npm run lint && npm run build && npm test && npm run test:acceptance",
     "lint": "eslint .",
