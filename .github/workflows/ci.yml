@@ -45,10 +45,6 @@ jobs:
         run: |
           npm test
 
-      - name: Integration tests
-        run: |
-          npm run test:integration
-
       - name: Acceptance tests
         run: |
           npm run test:acceptance

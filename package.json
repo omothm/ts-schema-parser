@@ -8,12 +8,11 @@
   ],
   "scripts": {
     "build": "tsc --project tsconfig.dev.json",
-    "ci": "npm run lint && npm run build && npm test && npm run test:integration && npm run test:acceptance",
+    "ci": "npm run lint && npm run build && npm test && npm run test:acceptance",
     "lint": "eslint .",
     "prepublishOnly": "npm run build",
     "test": "tap \"src/**/*.test.ts\"",
-    "test:acceptance": "tap \"test/acceptance/**/*.test.ts\"",
-    "test:integration": "tap \"test/integration/**/*.test.ts\" --coverage-map=test/integration/tapCoverageMap.js"
+    "test:acceptance": "tap \"test/acceptance/**/*.test.ts\" --no-coverage"
   },
   "repository": {
     "type": "git",

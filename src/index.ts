@@ -1,1 +1,1 @@
-export { default as exampleFunction } from './core/example';
+export * from './core/schema';
