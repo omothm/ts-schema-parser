@@ -8,7 +8,7 @@ node_modules
 .DS_Store
 
 # output
-dist
+lib/
 
 # tap (istanbul)
 .nyc_output/

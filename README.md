@@ -1,36 +1,6 @@
-# TypeScript project template
+# TS Schema Parser
 
-This template is a starting point for TypeScript projects. It features the following tools:
+[![npm version](https://badge.fury.io/js/ts-schema-parser.svg)](https://www.npmjs.com/package/ts-schema-parser)
+![CI](https://github.com/omothm/ts-schema-parser/actions/workflows/ci.yml/badge.svg)
 
-- [ESLint](https://eslint.org/)
-- [GitHub Actions](https://github.com/features/actions)
-- [Node Tap](https://node-tap.org)
-- [Prettier](https://prettier.io)
-
-## Replace placeholders
-
-After cloning this repository, change the following files:
-
-### [LICENSE](LICENSE)
-
-Replace it with the actual license or delete it if none exists.
-
-### [package.json](package.json)
-
-Replace these values:
-
-- `name`
-- `version` (optional)
-- `description`
-- `private: true` (add if needed)
-- `repository.url`
-- `keywords` (optional, for NPM packages)
-- `author`
-- `license`
-- `bugs.url`
-- `homepage`
-
-After changing these, change the corresponding values in `package-lock.json` to match or run
-`npm install` to have it done for you automatically.
-
-### This README.md file
+Parse objects of unknown origin into fully typed TypeScript objects.
