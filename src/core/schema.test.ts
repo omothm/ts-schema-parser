@@ -2,6 +2,70 @@ import tap from 'tap';
 import { throws } from '../../test/utils/tap';
 import { Schema as S } from './schema';
 
+void tap.test('array', async (t) => {
+  await t.test('should throw on non-array value', (t2) => {
+    const schema = S.array(S.string());
+
+    throws(t2, () => schema.parse(123), TypeError);
+    throws(t2, () => schema.parse('123'), TypeError);
+    throws(t2, () => schema.parse(true), TypeError);
+    throws(t2, () => schema.parse({}), TypeError);
+    throws(t2, () => schema.parse(null), TypeError);
+    throws(t2, () => schema.parse(undefined), TypeError);
+    t2.end();
+  });
+
+  await t.test('should throw on heterogeneous array', (t2) => {
+    const schema1 = S.array(S.string());
+    throws(t2, () => schema1.parse([123]), TypeError);
+    throws(t2, () => schema1.parse(['abc', 'def', 123]), TypeError);
+    throws(t2, () => schema1.parse(['abc', 123, 'def']), TypeError);
+
+    const schema2 = S.array(S.number());
+    throws(t2, () => schema2.parse(['123']), TypeError);
+    throws(t2, () => schema2.parse(['abc', 123]), TypeError);
+    throws(t2, () => schema2.parse([123, 'def']), TypeError);
+
+    const schema3 = S.array(S.object({ required: { code: S.string(), link: S.string() } }));
+    throws(t2, () => schema3.parse([{ code: '123', link: 'abc' }, { code: '456' }]), TypeError);
+    throws(
+      t2,
+      () =>
+        schema3.parse([
+          { code: '123', link: 'abc' },
+          { code: '456', link: 123 },
+        ]),
+      TypeError,
+    );
+
+    t2.end();
+  });
+
+  await t.test('should parse empty array', (t2) => {
+    const schema = S.array(S.string());
+    const parsed = schema.parse([]);
+    t2.strictSame(parsed, []);
+    t2.end();
+  });
+
+  await t.test('should parse non-empty array', (t2) => {
+    const schema1 = S.array(S.string());
+    const parsed1 = schema1.parse(['abc', 'def', 'ghi']);
+    t2.strictSame(parsed1, ['abc', 'def', 'ghi']);
+
+    const schema2 = S.array(S.object({ required: { code: S.string(), link: S.string() } }));
+    const parsed2 = schema2.parse([
+      { code: '123', link: 'abc' },
+      { code: '456', link: 'def' },
+    ]);
+    t2.strictSame(parsed2, [
+      { code: '123', link: 'abc' },
+      { code: '456', link: 'def' },
+    ]);
+    t2.end();
+  });
+});
+
 void tap.test('boolean', async (t) => {
   const schema = S.boolean();
 
@@ -11,6 +75,7 @@ void tap.test('boolean', async (t) => {
     throws(t2, () => schema.parse(null), TypeError);
     throws(t2, () => schema.parse(undefined), TypeError);
     throws(t2, () => schema.parse({}), TypeError);
+    throws(t2, () => schema.parse([]), TypeError);
     t2.end();
   });
 
@@ -47,6 +112,7 @@ void tap.test('number', async (t) => {
     throws(t2, () => schema.parse(null), TypeError);
     throws(t2, () => schema.parse(undefined), TypeError);
     throws(t2, () => schema.parse({}), TypeError);
+    throws(t2, () => schema.parse([]), TypeError);
     t2.end();
   });
 
@@ -65,6 +131,7 @@ void tap.test('object', async (t) => {
     throws(t2, () => schema.parse(true), TypeError);
     throws(t2, () => schema.parse(null), TypeError);
     throws(t2, () => schema.parse(undefined), TypeError);
+    throws(t2, () => schema.parse([]), TypeError);
     t2.end();
   });
 
@@ -174,6 +241,7 @@ void tap.test('string', async (t) => {
     throws(t2, () => schema.parse(null), TypeError);
     throws(t2, () => schema.parse(undefined), TypeError);
     throws(t2, () => schema.parse({}), TypeError);
+    throws(t2, () => schema.parse([]), TypeError);
     t2.end();
   });
 

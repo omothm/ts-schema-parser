@@ -1,6 +1,10 @@
 export type Infer<T extends SchemaType> = T['_type'];
 
 export class Schema {
+  static array<T extends SchemaType>(elementType: T): ArrayType<T> {
+    return new ArrayType(elementType);
+  }
+
   static boolean(): BooleanType {
     return new BooleanType();
   }
@@ -29,6 +33,22 @@ export abstract class SchemaType<T = unknown> {
   /** We don't need any actual value set on this property, we use it solely for type tracking. */
   readonly _type!: T;
   abstract parse(obj: unknown): T;
+}
+
+class ArrayType<T extends SchemaType> extends SchemaType<Array<Infer<T>>> {
+  constructor(private elementType: T) {
+    super();
+  }
+
+  parse(obj: unknown): Array<Infer<T>> {
+    if (!Array.isArray(obj)) {
+      throw new TypeError('Expected an array');
+    }
+    obj.forEach((elem) => {
+      this.elementType.parse(elem);
+    });
+    return obj as Array<Infer<T>>;
+  }
 }
 
 class BooleanType extends SchemaType<boolean> {
@@ -100,7 +120,7 @@ class ObjectType<
   }
 
   parse(obj: unknown): InferObjectType<R, O> {
-    if (!(obj instanceof Object)) {
+    if (!(obj instanceof Object) || Array.isArray(obj)) {
       throw new TypeError();
     }
     for (const [key, value] of Object.entries(
