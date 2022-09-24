@@ -120,8 +120,8 @@ class ObjectType<
   }
 
   parse(obj: unknown): InferObjectType<R, O> {
-    if (!(obj instanceof Object) || Array.isArray(obj)) {
-      throw new TypeError();
+    if (obj === null || typeof obj !== 'object' || Array.isArray(obj)) {
+      throw new TypeError('Expected an object');
     }
     for (const [key, value] of Object.entries(
       this.params?.required ?? ({} as Record<string, SchemaType<unknown>>),
