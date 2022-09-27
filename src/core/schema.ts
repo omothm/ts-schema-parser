@@ -24,6 +24,16 @@ export class Schema {
     return new ObjectType(params);
   }
 
+  static partial<
+    R extends Record<string, SchemaType> | undefined,
+    O extends Record<string, SchemaType> | undefined,
+    // eslint-disable-next-line @typescript-eslint/ban-types
+  >(obj: ObjectType<R, O>): ObjectType<{}, NonEmpty<R> & NonEmpty<O>> {
+    return new ObjectType({
+      optional: { ...obj.params?.required, ...obj.params?.optional } as NonEmpty<R> & NonEmpty<O>,
+    });
+  }
+
   static string(): StringType {
     return new StringType();
   }
@@ -115,7 +125,7 @@ class ObjectType<
   R extends Record<string, SchemaType> | undefined,
   O extends Record<string, SchemaType> | undefined,
 > extends SchemaType<InferObjectType<R, O>> {
-  constructor(private params?: ObjectTypeParams<R, O>) {
+  constructor(readonly params?: ObjectTypeParams<R, O>) {
     super();
   }
 
@@ -153,3 +163,6 @@ class StringType extends SchemaType<string> {
 }
 
 type Flatten<T> = T extends Record<string, unknown> ? { [K in keyof T]: T[K] } : T;
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+type NonEmpty<T> = {} extends T ? {} : T;
