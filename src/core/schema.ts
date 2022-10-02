@@ -34,6 +34,10 @@ export class Schema {
     });
   }
 
+  static record<T extends SchemaType>(valueSchema: T): RecordType<T> {
+    return new RecordType(valueSchema);
+  }
+
   static string(): StringType {
     return new StringType();
   }
@@ -150,6 +154,22 @@ class ObjectType<
       value.parse((obj as Record<string, unknown>)[key]);
     }
     return obj as InferObjectType<R, O>;
+  }
+}
+
+class RecordType<T extends SchemaType> extends SchemaType<Record<string, Infer<T>>> {
+  constructor(private readonly valueSchema: T) {
+    super();
+  }
+
+  parse(obj: unknown): Record<string, Infer<T>> {
+    if (obj === null || typeof obj !== 'object' || Array.isArray(obj)) {
+      throw new TypeError('Expected an object');
+    }
+    Object.values(obj).forEach((value) => {
+      this.valueSchema.parse(value);
+    });
+    return obj as Record<string, Infer<T>>;
   }
 }
 

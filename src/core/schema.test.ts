@@ -344,6 +344,62 @@ void tap.test('partial', async (t) => {
   });
 });
 
+void tap.test('record', async (t) => {
+  await t.test('should throw on non-object value', (t2) => {
+    const schema = S.record(S.string());
+    throws(t2, () => schema.parse('123'), TypeError);
+    throws(t2, () => schema.parse(123), TypeError);
+    throws(t2, () => schema.parse(true), TypeError);
+    throws(t2, () => schema.parse(null), TypeError);
+    throws(t2, () => schema.parse(undefined), TypeError);
+    throws(t2, () => schema.parse([]), TypeError);
+    t2.end();
+  });
+
+  await t.test('should parse empty object', (t2) => {
+    const schema = S.record(S.string());
+    const parsed = schema.parse({});
+    t2.strictSame(parsed, {});
+    t2.end();
+  });
+
+  await t.test('should throw on one invalid value', (t2) => {
+    const schema = S.record(S.object());
+    throws(t2, () => schema.parse({ value: '123' }), TypeError);
+    throws(t2, () => schema.parse({ value: 123 }), TypeError);
+    throws(t2, () => schema.parse({ value: true }), TypeError);
+    throws(t2, () => schema.parse({ value: null }), TypeError);
+    throws(t2, () => schema.parse({ value: undefined }), TypeError);
+    throws(t2, () => schema.parse({ value: [] }), TypeError);
+    t2.end();
+  });
+
+  await t.test('should throw on one invalid, one valid value', (t2) => {
+    const schema = S.record(S.object());
+    throws(t2, () => schema.parse({ value1: '123', value2: {} }), TypeError);
+    throws(t2, () => schema.parse({ value1: {}, value2: 123 }), TypeError);
+    throws(t2, () => schema.parse({ value1: true, value2: {} }), TypeError);
+    throws(t2, () => schema.parse({ value1: {}, value2: null }), TypeError);
+    throws(t2, () => schema.parse({ value1: undefined, value2: {} }), TypeError);
+    throws(t2, () => schema.parse({ value1: {}, value2: [] }), TypeError);
+    t2.end();
+  });
+
+  await t.test('should parse single valid value', (t2) => {
+    const schema = S.record(S.string());
+    const parsed = schema.parse({ value: 'abc' });
+    t2.strictSame(parsed, { value: 'abc' });
+    t2.end();
+  });
+
+  await t.test('should parse multiple valid values', (t2) => {
+    const schema = S.record(S.enum('abc', 'def'));
+    const parsed = schema.parse({ value1: 'abc', value2: 'def' });
+    t2.strictSame(parsed, { value1: 'abc', value2: 'def' });
+    t2.end();
+  });
+});
+
 void tap.test('string', async (t) => {
   const schema = S.string();
 

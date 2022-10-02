@@ -1,6 +1,6 @@
 {
   "name": "ts-schema-parser",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Parse objects of unknown origin into fully typed TypeScript objects",
   "main": "lib/index.js",
   "files": [
