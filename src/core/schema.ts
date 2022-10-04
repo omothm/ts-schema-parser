@@ -34,12 +34,16 @@ export class Schema {
     });
   }
 
-  static record<T extends SchemaType>(valueSchema: T): RecordType<T> {
+  static record<T extends SchemaType>(valueSchema?: T): RecordType<T> {
     return new RecordType(valueSchema);
   }
 
   static string(): StringType {
     return new StringType();
+  }
+
+  static unknown(): UnknownType {
+    return new UnknownType();
   }
 }
 
@@ -158,7 +162,7 @@ class ObjectType<
 }
 
 class RecordType<T extends SchemaType> extends SchemaType<Record<string, Infer<T>>> {
-  constructor(private readonly valueSchema: T) {
+  constructor(private readonly valueSchema = new UnknownType()) {
     super();
   }
 
@@ -178,6 +182,12 @@ class StringType extends SchemaType<string> {
     if (typeof obj !== 'string') {
       throw new TypeError();
     }
+    return obj;
+  }
+}
+
+class UnknownType extends SchemaType<unknown> {
+  parse(obj: unknown): unknown {
     return obj;
   }
 }

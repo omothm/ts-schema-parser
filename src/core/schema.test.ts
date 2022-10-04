@@ -346,7 +346,7 @@ void tap.test('partial', async (t) => {
 
 void tap.test('record', async (t) => {
   await t.test('should throw on non-object value', (t2) => {
-    const schema = S.record(S.string());
+    const schema = S.record();
     throws(t2, () => schema.parse('123'), TypeError);
     throws(t2, () => schema.parse(123), TypeError);
     throws(t2, () => schema.parse(true), TypeError);
@@ -416,6 +416,20 @@ void tap.test('string', async (t) => {
   await t.test('should parse string', (t2) => {
     const parsed = schema.parse('hello');
     t2.equal(parsed, 'hello');
+    t2.end();
+  });
+});
+
+void tap.test('unknown', async (t) => {
+  await t.test('should pass any value', (t2) => {
+    const schema = S.unknown();
+    t2.equal(schema.parse('123'), '123');
+    t2.equal(schema.parse(123), 123);
+    t2.equal(schema.parse(true), true);
+    t2.equal(schema.parse(null), null);
+    t2.equal(schema.parse(undefined), undefined);
+    t2.strictSame(schema.parse([]), []);
+    t2.strictSame(schema.parse({}), {});
     t2.end();
   });
 });
