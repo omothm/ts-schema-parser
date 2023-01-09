@@ -10,6 +10,5 @@ node_modules
 # output
 lib/
 
-# tap (istanbul)
-.nyc_output/
+# testing
 coverage/

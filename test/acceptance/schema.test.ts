@@ -1,13 +1,13 @@
-import tap from 'tap';
+import test from 'ava';
 import Api from './api';
 
 let api: Api;
 
-void tap.beforeEach(() => {
+test.beforeEach(() => {
   api = new Api();
 });
 
-void tap.test('schema acceptance test', (t) => {
+test('schema acceptance test', (t) => {
   api.setSchema((builder) => {
     return builder.object({
       required: {
@@ -83,5 +83,5 @@ void tap.test('schema acceptance test', (t) => {
     emailAddress: 'anna.doe@example.com',
     phoneNumber: '+5060708090',
   });
-  t.end();
+  t.pass();
 });

@@ -1,435 +1,364 @@
-import tap from 'tap';
-import { throws } from '../../test/utils/tap';
+import test from 'ava';
 import { Schema as S } from './schema';
 
-void tap.test('array', async (t) => {
-  await t.test('should throw on non-array value', (t2) => {
-    const schema = S.array(S.string());
+test('array: should throw on non-array value', (t) => {
+  const schema = S.array(S.string());
 
-    throws(t2, () => schema.parse(123), TypeError);
-    throws(t2, () => schema.parse('123'), TypeError);
-    throws(t2, () => schema.parse(true), TypeError);
-    throws(t2, () => schema.parse({}), TypeError);
-    throws(t2, () => schema.parse(null), TypeError);
-    throws(t2, () => schema.parse(undefined), TypeError);
-    t2.end();
-  });
+  t.true(t.throws(() => schema.parse(123)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse('123')) instanceof TypeError);
+  t.true(t.throws(() => schema.parse(true)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse({})) instanceof TypeError);
+  t.true(t.throws(() => schema.parse(null)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse(undefined)) instanceof TypeError);
+});
 
-  await t.test('should throw on heterogeneous array', (t2) => {
-    const schema1 = S.array(S.string());
-    throws(t2, () => schema1.parse([123]), TypeError);
-    throws(t2, () => schema1.parse(['abc', 'def', 123]), TypeError);
-    throws(t2, () => schema1.parse(['abc', 123, 'def']), TypeError);
+test('array: should throw on heterogeneous array', (t) => {
+  const schema1 = S.array(S.string());
+  t.true(t.throws(() => schema1.parse([123])) instanceof TypeError);
+  t.true(t.throws(() => schema1.parse(['abc', 'def', 123])) instanceof TypeError);
+  t.true(t.throws(() => schema1.parse(['abc', 123, 'def'])) instanceof TypeError);
 
-    const schema2 = S.array(S.number());
-    throws(t2, () => schema2.parse(['123']), TypeError);
-    throws(t2, () => schema2.parse(['abc', 123]), TypeError);
-    throws(t2, () => schema2.parse([123, 'def']), TypeError);
+  const schema2 = S.array(S.number());
+  t.true(t.throws(() => schema2.parse(['123'])) instanceof TypeError);
+  t.true(t.throws(() => schema2.parse(['abc', 123])) instanceof TypeError);
+  t.true(t.throws(() => schema2.parse([123, 'def'])) instanceof TypeError);
 
-    const schema3 = S.array(S.object({ required: { code: S.string(), link: S.string() } }));
-    throws(t2, () => schema3.parse([{ code: '123', link: 'abc' }, { code: '456' }]), TypeError);
-    throws(
-      t2,
-      () =>
-        schema3.parse([
-          { code: '123', link: 'abc' },
-          { code: '456', link: 123 },
-        ]),
+  const schema3 = S.array(S.object({ required: { code: S.string(), link: S.string() } }));
+  t.true(
+    t.throws(() => schema3.parse([{ code: '123', link: 'abc' }, { code: '456' }])) instanceof
       TypeError,
-    );
-
-    t2.end();
-  });
-
-  await t.test('should parse empty array', (t2) => {
-    const schema = S.array(S.string());
-    const parsed = schema.parse([]);
-    t2.strictSame(parsed, []);
-    t2.end();
-  });
-
-  await t.test('should parse non-empty array', (t2) => {
-    const schema1 = S.array(S.string());
-    const parsed1 = schema1.parse(['abc', 'def', 'ghi']);
-    t2.strictSame(parsed1, ['abc', 'def', 'ghi']);
-
-    const schema2 = S.array(S.object({ required: { code: S.string(), link: S.string() } }));
-    const parsed2 = schema2.parse([
-      { code: '123', link: 'abc' },
-      { code: '456', link: 'def' },
-    ]);
-    t2.strictSame(parsed2, [
-      { code: '123', link: 'abc' },
-      { code: '456', link: 'def' },
-    ]);
-    t2.end();
-  });
+  );
+  t.true(
+    t.throws(() =>
+      schema3.parse([
+        { code: '123', link: 'abc' },
+        { code: '456', link: 123 },
+      ]),
+    ) instanceof TypeError,
+  );
 });
 
-void tap.test('boolean', async (t) => {
+test('array: should parse empty array', (t) => {
+  const schema = S.array(S.string());
+  const parsed = schema.parse([]);
+  t.deepEqual(parsed, []);
+});
+
+test('array: should parse non-empty array', (t) => {
+  const schema1 = S.array(S.string());
+  const parsed1 = schema1.parse(['abc', 'def', 'ghi']);
+  t.deepEqual(parsed1, ['abc', 'def', 'ghi']);
+
+  const schema2 = S.array(S.object({ required: { code: S.string(), link: S.string() } }));
+  const parsed2 = schema2.parse([
+    { code: '123', link: 'abc' },
+    { code: '456', link: 'def' },
+  ]);
+  t.deepEqual(parsed2, [
+    { code: '123', link: 'abc' },
+    { code: '456', link: 'def' },
+  ]);
+});
+
+test('boolean: should throw on non-boolean value', (t) => {
   const schema = S.boolean();
-
-  await t.test('should throw on non-boolean value', (t2) => {
-    throws(t2, () => schema.parse('123'), TypeError);
-    throws(t2, () => schema.parse(123), TypeError);
-    throws(t2, () => schema.parse(null), TypeError);
-    throws(t2, () => schema.parse(undefined), TypeError);
-    throws(t2, () => schema.parse({}), TypeError);
-    throws(t2, () => schema.parse([]), TypeError);
-    t2.end();
-  });
-
-  await t.test('should parse boolean', (t2) => {
-    const parsed = schema.parse(true);
-    t2.equal(parsed, true);
-    t2.end();
-  });
+  t.true(t.throws(() => schema.parse('123')) instanceof TypeError);
+  t.true(t.throws(() => schema.parse(123)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse(null)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse(undefined)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse({})) instanceof TypeError);
+  t.true(t.throws(() => schema.parse([])) instanceof TypeError);
 });
 
-void tap.test('enum', async (t) => {
-  await t.test('should throw on non-enum values', (t2) => {
-    const schema = S.enum('a', 'b', 'c');
-
-    throws(t2, () => schema.parse('d'), TypeError);
-
-    let parsed = schema.parse('a');
-    t2.equal(parsed, 'a');
-    parsed = schema.parse('b');
-    t2.equal(parsed, 'b');
-    parsed = schema.parse('c');
-    t2.equal(parsed, 'c');
-
-    t2.end();
-  });
+test('boolean: should parse boolean', (t) => {
+  const schema = S.boolean();
+  const parsed = schema.parse(true);
+  t.is(parsed, true);
 });
 
-void tap.test('number', async (t) => {
+test('enum: should throw on non-enum values', (t) => {
+  const schema = S.enum('a', 'b', 'c');
+
+  t.true(t.throws(() => schema.parse('d')) instanceof TypeError);
+
+  let parsed = schema.parse('a');
+  t.is(parsed, 'a');
+  parsed = schema.parse('b');
+  t.is(parsed, 'b');
+  parsed = schema.parse('c');
+  t.is(parsed, 'c');
+});
+
+test('number: should throw on non-number value', (t) => {
   const schema = S.number();
-
-  await t.test('should throw on non-number value', (t2) => {
-    throws(t2, () => schema.parse('123'), TypeError);
-    throws(t2, () => schema.parse(true), TypeError);
-    throws(t2, () => schema.parse(null), TypeError);
-    throws(t2, () => schema.parse(undefined), TypeError);
-    throws(t2, () => schema.parse({}), TypeError);
-    throws(t2, () => schema.parse([]), TypeError);
-    t2.end();
-  });
-
-  await t.test('should parse number', (t2) => {
-    const parsed = schema.parse(123);
-    t2.equal(parsed, 123);
-    t2.end();
-  });
+  t.true(t.throws(() => schema.parse('123')) instanceof TypeError);
+  t.true(t.throws(() => schema.parse(true)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse(null)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse(undefined)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse({})) instanceof TypeError);
+  t.true(t.throws(() => schema.parse([])) instanceof TypeError);
 });
 
-void tap.test('object', async (t) => {
-  await t.test('should throw on non-object value', (t2) => {
-    const schema = S.object();
-    throws(t2, () => schema.parse('123'), TypeError);
-    throws(t2, () => schema.parse(123), TypeError);
-    throws(t2, () => schema.parse(true), TypeError);
-    throws(t2, () => schema.parse(null), TypeError);
-    throws(t2, () => schema.parse(undefined), TypeError);
-    throws(t2, () => schema.parse([]), TypeError);
-    t2.end();
+test('number: should parse number', (t) => {
+  const schema = S.number();
+  const parsed = schema.parse(123);
+  t.is(parsed, 123);
+});
+
+test('object: should throw on non-object value', (t) => {
+  const schema = S.object();
+  t.true(t.throws(() => schema.parse('123')) instanceof TypeError);
+  t.true(t.throws(() => schema.parse(123)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse(true)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse(null)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse(undefined)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse([])) instanceof TypeError);
+});
+
+test('object: should parse empty object', (t) => {
+  const schema1 = S.object();
+  const parsed1 = schema1.parse({});
+  t.deepEqual(parsed1, {});
+
+  const schema2 = S.object({ required: {} });
+  const parsed2 = schema2.parse({});
+  t.deepEqual(parsed2, {});
+
+  const schema3 = S.object({ optional: {} });
+  const parsed3 = schema3.parse({});
+  t.deepEqual(parsed3, {});
+
+  const schema4 = S.object({ required: {}, optional: {} });
+  const parsed4 = schema4.parse({});
+  t.deepEqual(parsed4, {});
+});
+
+test('object: should parse object with 1 required prop', (t) => {
+  const schema = S.object({ required: { title: S.string() } });
+
+  t.true(t.throws(() => schema.parse({})) instanceof TypeError);
+  t.true(t.throws(() => schema.parse({ title: 123 })) instanceof TypeError);
+
+  const parsed = schema.parse({ title: '123' });
+  t.deepEqual(parsed, { title: '123' });
+});
+
+test('object: should parse object with 1+ required prop', (t) => {
+  const schema = S.object({ required: { title: S.string(), body: S.string() } });
+
+  t.true(t.throws(() => schema.parse({})) instanceof TypeError);
+  t.true(t.throws(() => schema.parse({ title: '123' })) instanceof TypeError);
+  t.true(t.throws(() => schema.parse({ body: 'hello' })) instanceof TypeError);
+
+  const parsed = schema.parse({ title: '123', body: 'hello' });
+  t.deepEqual(parsed, { title: '123', body: 'hello' });
+});
+
+test('object: should parse object with 1 optional prop', (t) => {
+  const schema = S.object({ optional: { title: S.string() } });
+
+  t.true(t.throws(() => schema.parse({ title: 123 })) instanceof TypeError);
+
+  let parsed = schema.parse({});
+  t.deepEqual(parsed, {});
+
+  parsed = schema.parse({ title: '123' });
+  t.deepEqual(parsed, { title: '123' });
+});
+
+test('object: should parse object with 1+ optional prop', (t) => {
+  const schema = S.object({ optional: { title: S.string(), body: S.string() } });
+
+  let parsed = schema.parse({ title: '123' });
+  t.deepEqual(parsed, { title: '123' });
+
+  parsed = schema.parse({ body: 'hello' });
+  t.deepEqual(parsed, { body: 'hello' });
+
+  parsed = schema.parse({ title: '123', body: 'hello' });
+  t.deepEqual(parsed, { title: '123', body: 'hello' });
+});
+
+test('object: should parse object with required and optional props', (t) => {
+  const schema = S.object({
+    required: { title: S.string() },
+    optional: { body: S.string() },
   });
 
-  await t.test('should parse empty object', (t2) => {
-    const schema1 = S.object();
-    const parsed1 = schema1.parse({});
-    t2.strictSame(parsed1, {});
+  t.true(t.throws(() => schema.parse({})) instanceof TypeError);
+  t.true(t.throws(() => schema.parse({ body: 'hello' })) instanceof TypeError);
 
-    const schema2 = S.object({ required: {} });
-    const parsed2 = schema2.parse({});
-    t2.strictSame(parsed2, {});
+  let parsed = schema.parse({ title: '123' });
+  t.deepEqual(parsed, { title: '123' });
 
-    const schema3 = S.object({ optional: {} });
-    const parsed3 = schema3.parse({});
-    t2.strictSame(parsed3, {});
+  parsed = schema.parse({ title: '123', body: 'hello' });
+  t.deepEqual(parsed, { title: '123', body: 'hello' });
+});
 
-    const schema4 = S.object({ required: {}, optional: {} });
-    const parsed4 = schema4.parse({});
-    t2.strictSame(parsed4, {});
+test('partial: should throw on non-object value', (t) => {
+  const obj = S.object();
+  const schema = S.partial(obj);
+  t.true(t.throws(() => schema.parse('123')) instanceof TypeError);
+  t.true(t.throws(() => schema.parse(123)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse(true)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse(null)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse(undefined)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse([])) instanceof TypeError);
+});
 
-    t2.end();
-  });
+test('partial: should parse empty object', (t) => {
+  const schema1 = S.partial(S.object());
+  const parsed1 = schema1.parse({});
+  t.deepEqual(parsed1, {});
 
-  await t.test('should parse object with required props', async (t2) => {
-    await t2.test('should parse object with 1 required prop', (t3) => {
-      const schema = S.object({ required: { title: S.string() } });
+  const schema2 = S.partial(S.object({ required: {} }));
+  const parsed2 = schema2.parse({});
+  t.deepEqual(parsed2, {});
 
-      throws(t3, () => schema.parse({}), TypeError);
-      throws(t3, () => schema.parse({ title: 123 }), TypeError);
+  const schema3 = S.partial(S.object({ optional: {} }));
+  const parsed3 = schema3.parse({});
+  t.deepEqual(parsed3, {});
 
-      const parsed = schema.parse({ title: '123' });
-      t3.strictSame(parsed, { title: '123' });
+  const schema4 = S.partial(S.object({ required: {}, optional: {} }));
+  const parsed4 = schema4.parse({});
+  t.deepEqual(parsed4, {});
+});
 
-      t3.end();
-    });
+test('partial: should parse object with 1 required prop', (t) => {
+  const schema = S.partial(S.object({ required: { title: S.string() } }));
 
-    await t2.test('should parse object with 1+ required prop', (t3) => {
-      const schema = S.object({ required: { title: S.string(), body: S.string() } });
+  t.notThrows(() => schema.parse({}));
+  t.true(t.throws(() => schema.parse({ title: 123 })) instanceof TypeError);
 
-      throws(t3, () => schema.parse({}), TypeError);
-      throws(t3, () => schema.parse({ title: '123' }), TypeError);
-      throws(t3, () => schema.parse({ body: 'hello' }), TypeError);
+  const parsed = schema.parse({ title: '123' });
+  t.deepEqual(parsed, { title: '123' });
+});
 
-      const parsed = schema.parse({ title: '123', body: 'hello' });
-      t3.strictSame(parsed, { title: '123', body: 'hello' });
+test('partial: should parse object with 1+ required prop', (t) => {
+  const schema = S.partial(S.object({ required: { title: S.string(), body: S.string() } }));
 
-      t3.end();
-    });
-  });
+  t.notThrows(() => schema.parse({}));
+  t.notThrows(() => schema.parse({ title: '123' }));
+  t.notThrows(() => schema.parse({ body: 'hello' }));
 
-  await t.test('should parse object with optional props', async (t2) => {
-    await t2.test('should parse object with 1 optional prop', (t3) => {
-      const schema = S.object({ optional: { title: S.string() } });
+  const parsed = schema.parse({ title: '123', body: 'hello' });
+  t.deepEqual(parsed, { title: '123', body: 'hello' });
+});
 
-      throws(t3, () => schema.parse({ title: 123 }), TypeError);
+test('partial: should parse object with 1 optional prop', (t) => {
+  const schema = S.partial(S.object({ optional: { title: S.string() } }));
 
-      let parsed = schema.parse({});
-      t3.strictSame(parsed, {});
+  t.true(t.throws(() => schema.parse({ title: 123 })) instanceof TypeError);
 
-      parsed = schema.parse({ title: '123' });
-      t3.strictSame(parsed, { title: '123' });
+  let parsed = schema.parse({});
+  t.deepEqual(parsed, {});
 
-      t3.end();
-    });
+  parsed = schema.parse({ title: '123' });
+  t.deepEqual(parsed, { title: '123' });
+});
 
-    await t2.test('should parse object with 1+ optional prop', (t3) => {
-      const schema = S.object({ optional: { title: S.string(), body: S.string() } });
+test('partial: should parse object with 1+ optional prop', (t) => {
+  const schema = S.partial(S.object({ optional: { title: S.string(), body: S.string() } }));
 
-      let parsed = schema.parse({ title: '123' });
-      t3.strictSame(parsed, { title: '123' });
+  let parsed = schema.parse({ title: '123' });
+  t.deepEqual(parsed, { title: '123' });
 
-      parsed = schema.parse({ body: 'hello' });
-      t3.strictSame(parsed, { body: 'hello' });
+  parsed = schema.parse({ body: 'hello' });
+  t.deepEqual(parsed, { body: 'hello' });
 
-      parsed = schema.parse({ title: '123', body: 'hello' });
-      t3.strictSame(parsed, { title: '123', body: 'hello' });
+  parsed = schema.parse({ title: '123', body: 'hello' });
+  t.deepEqual(parsed, { title: '123', body: 'hello' });
+});
 
-      t3.end();
-    });
-  });
-
-  await t.test('should parse object with required and optional props', (t2) => {
-    const schema = S.object({
+test('partial: should parse object with required and optional props', (t) => {
+  const schema = S.partial(
+    S.object({
       required: { title: S.string() },
       optional: { body: S.string() },
-    });
+    }),
+  );
 
-    throws(t2, () => schema.parse({}), TypeError);
-    throws(t2, () => schema.parse({ body: 'hello' }), TypeError);
+  t.notThrows(() => schema.parse({}));
+  t.notThrows(() => schema.parse({ body: 'hello' }));
 
-    let parsed = schema.parse({ title: '123' });
-    t2.strictSame(parsed, { title: '123' });
+  let parsed = schema.parse({ title: '123' });
+  t.deepEqual(parsed, { title: '123' });
 
-    parsed = schema.parse({ title: '123', body: 'hello' });
-    t2.strictSame(parsed, { title: '123', body: 'hello' });
-
-    t2.end();
-  });
+  parsed = schema.parse({ title: '123', body: 'hello' });
+  t.deepEqual(parsed, { title: '123', body: 'hello' });
 });
 
-void tap.test('partial', async (t) => {
-  await t.test('should throw on non-object value', (t2) => {
-    const obj = S.object();
-    const schema = S.partial(obj);
-    throws(t2, () => schema.parse('123'), TypeError);
-    throws(t2, () => schema.parse(123), TypeError);
-    throws(t2, () => schema.parse(true), TypeError);
-    throws(t2, () => schema.parse(null), TypeError);
-    throws(t2, () => schema.parse(undefined), TypeError);
-    throws(t2, () => schema.parse([]), TypeError);
-    t2.end();
-  });
-
-  await t.test('should parse empty object', (t2) => {
-    const schema1 = S.partial(S.object());
-    const parsed1 = schema1.parse({});
-    t2.strictSame(parsed1, {});
-
-    const schema2 = S.partial(S.object({ required: {} }));
-    const parsed2 = schema2.parse({});
-    t2.strictSame(parsed2, {});
-
-    const schema3 = S.partial(S.object({ optional: {} }));
-    const parsed3 = schema3.parse({});
-    t2.strictSame(parsed3, {});
-
-    const schema4 = S.partial(S.object({ required: {}, optional: {} }));
-    const parsed4 = schema4.parse({});
-    t2.strictSame(parsed4, {});
-
-    t2.end();
-  });
-
-  await t.test('should parse object with required props', async (t2) => {
-    await t2.test('should parse object with 1 required prop', (t3) => {
-      const schema = S.partial(S.object({ required: { title: S.string() } }));
-
-      t3.doesNotThrow(() => schema.parse({}));
-      throws(t3, () => schema.parse({ title: 123 }), TypeError);
-
-      const parsed = schema.parse({ title: '123' });
-      t3.strictSame(parsed, { title: '123' });
-
-      t3.end();
-    });
-
-    await t2.test('should parse object with 1+ required prop', (t3) => {
-      const schema = S.partial(S.object({ required: { title: S.string(), body: S.string() } }));
-
-      t3.doesNotThrow(() => schema.parse({}));
-      t3.doesNotThrow(() => schema.parse({ title: '123' }));
-      t3.doesNotThrow(() => schema.parse({ body: 'hello' }));
-
-      const parsed = schema.parse({ title: '123', body: 'hello' });
-      t3.strictSame(parsed, { title: '123', body: 'hello' });
-
-      t3.end();
-    });
-  });
-
-  await t.test('should parse object with optional props', async (t2) => {
-    await t2.test('should parse object with 1 optional prop', (t3) => {
-      const schema = S.partial(S.object({ optional: { title: S.string() } }));
-
-      throws(t3, () => schema.parse({ title: 123 }), TypeError);
-
-      let parsed = schema.parse({});
-      t3.strictSame(parsed, {});
-
-      parsed = schema.parse({ title: '123' });
-      t3.strictSame(parsed, { title: '123' });
-
-      t3.end();
-    });
-
-    await t2.test('should parse object with 1+ optional prop', (t3) => {
-      const schema = S.partial(S.object({ optional: { title: S.string(), body: S.string() } }));
-
-      let parsed = schema.parse({ title: '123' });
-      t3.strictSame(parsed, { title: '123' });
-
-      parsed = schema.parse({ body: 'hello' });
-      t3.strictSame(parsed, { body: 'hello' });
-
-      parsed = schema.parse({ title: '123', body: 'hello' });
-      t3.strictSame(parsed, { title: '123', body: 'hello' });
-
-      t3.end();
-    });
-  });
-
-  await t.test('should parse object with required and optional props', (t2) => {
-    const schema = S.partial(
-      S.object({
-        required: { title: S.string() },
-        optional: { body: S.string() },
-      }),
-    );
-
-    t2.doesNotThrow(() => schema.parse({}));
-    t2.doesNotThrow(() => schema.parse({ body: 'hello' }));
-
-    let parsed = schema.parse({ title: '123' });
-    t2.strictSame(parsed, { title: '123' });
-
-    parsed = schema.parse({ title: '123', body: 'hello' });
-    t2.strictSame(parsed, { title: '123', body: 'hello' });
-
-    t2.end();
-  });
+test('record: should throw on non-object value', (t) => {
+  const schema = S.record();
+  t.true(t.throws(() => schema.parse('123')) instanceof TypeError);
+  t.true(t.throws(() => schema.parse(123)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse(true)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse(null)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse(undefined)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse([])) instanceof TypeError);
 });
 
-void tap.test('record', async (t) => {
-  await t.test('should throw on non-object value', (t2) => {
-    const schema = S.record();
-    throws(t2, () => schema.parse('123'), TypeError);
-    throws(t2, () => schema.parse(123), TypeError);
-    throws(t2, () => schema.parse(true), TypeError);
-    throws(t2, () => schema.parse(null), TypeError);
-    throws(t2, () => schema.parse(undefined), TypeError);
-    throws(t2, () => schema.parse([]), TypeError);
-    t2.end();
-  });
-
-  await t.test('should parse empty object', (t2) => {
-    const schema = S.record(S.string());
-    const parsed = schema.parse({});
-    t2.strictSame(parsed, {});
-    t2.end();
-  });
-
-  await t.test('should throw on one invalid value', (t2) => {
-    const schema = S.record(S.object());
-    throws(t2, () => schema.parse({ value: '123' }), TypeError);
-    throws(t2, () => schema.parse({ value: 123 }), TypeError);
-    throws(t2, () => schema.parse({ value: true }), TypeError);
-    throws(t2, () => schema.parse({ value: null }), TypeError);
-    throws(t2, () => schema.parse({ value: undefined }), TypeError);
-    throws(t2, () => schema.parse({ value: [] }), TypeError);
-    t2.end();
-  });
-
-  await t.test('should throw on one invalid, one valid value', (t2) => {
-    const schema = S.record(S.object());
-    throws(t2, () => schema.parse({ value1: '123', value2: {} }), TypeError);
-    throws(t2, () => schema.parse({ value1: {}, value2: 123 }), TypeError);
-    throws(t2, () => schema.parse({ value1: true, value2: {} }), TypeError);
-    throws(t2, () => schema.parse({ value1: {}, value2: null }), TypeError);
-    throws(t2, () => schema.parse({ value1: undefined, value2: {} }), TypeError);
-    throws(t2, () => schema.parse({ value1: {}, value2: [] }), TypeError);
-    t2.end();
-  });
-
-  await t.test('should parse single valid value', (t2) => {
-    const schema = S.record(S.string());
-    const parsed = schema.parse({ value: 'abc' });
-    t2.strictSame(parsed, { value: 'abc' });
-    t2.end();
-  });
-
-  await t.test('should parse multiple valid values', (t2) => {
-    const schema = S.record(S.enum('abc', 'def'));
-    const parsed = schema.parse({ value1: 'abc', value2: 'def' });
-    t2.strictSame(parsed, { value1: 'abc', value2: 'def' });
-    t2.end();
-  });
+test('record: should parse empty object', (t) => {
+  const schema = S.record(S.string());
+  const parsed = schema.parse({});
+  t.deepEqual(parsed, {});
 });
 
-void tap.test('string', async (t) => {
+test('record: should throw on one invalid value', (t) => {
+  const schema = S.record(S.object());
+  t.true(t.throws(() => schema.parse({ value: '123' })) instanceof TypeError);
+  t.true(t.throws(() => schema.parse({ value: 123 })) instanceof TypeError);
+  t.true(t.throws(() => schema.parse({ value: true })) instanceof TypeError);
+  t.true(t.throws(() => schema.parse({ value: null })) instanceof TypeError);
+  t.true(t.throws(() => schema.parse({ value: undefined })) instanceof TypeError);
+  t.true(t.throws(() => schema.parse({ value: [] })) instanceof TypeError);
+});
+
+test('record: should throw on one invalid, one valid value', (t) => {
+  const schema = S.record(S.object());
+  t.true(t.throws(() => schema.parse({ value1: '123', value2: {} })) instanceof TypeError);
+  t.true(t.throws(() => schema.parse({ value1: {}, value2: 123 })) instanceof TypeError);
+  t.true(t.throws(() => schema.parse({ value1: true, value2: {} })) instanceof TypeError);
+  t.true(t.throws(() => schema.parse({ value1: {}, value2: null })) instanceof TypeError);
+  t.true(t.throws(() => schema.parse({ value1: undefined, value2: {} })) instanceof TypeError);
+  t.true(t.throws(() => schema.parse({ value1: {}, value2: [] })) instanceof TypeError);
+});
+
+test('record: should parse single valid value', (t) => {
+  const schema = S.record(S.string());
+  const parsed = schema.parse({ value: 'abc' });
+  t.deepEqual(parsed, { value: 'abc' });
+});
+
+test('record: should parse multiple valid values', (t) => {
+  const schema = S.record(S.enum('abc', 'def'));
+  const parsed = schema.parse({ value1: 'abc', value2: 'def' });
+  t.deepEqual(parsed, { value1: 'abc', value2: 'def' });
+});
+
+test('string: should throw on non-string value', (t) => {
   const schema = S.string();
-
-  await t.test('should throw on non-string value', (t2) => {
-    throws(t2, () => schema.parse(123), TypeError);
-    throws(t2, () => schema.parse(true), TypeError);
-    throws(t2, () => schema.parse(null), TypeError);
-    throws(t2, () => schema.parse(undefined), TypeError);
-    throws(t2, () => schema.parse({}), TypeError);
-    throws(t2, () => schema.parse([]), TypeError);
-    t2.end();
-  });
-
-  await t.test('should parse string', (t2) => {
-    const parsed = schema.parse('hello');
-    t2.equal(parsed, 'hello');
-    t2.end();
-  });
+  t.true(t.throws(() => schema.parse(123)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse(true)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse(null)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse(undefined)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse({})) instanceof TypeError);
+  t.true(t.throws(() => schema.parse([])) instanceof TypeError);
 });
 
-void tap.test('unknown', async (t) => {
-  await t.test('should pass any value', (t2) => {
-    const schema = S.unknown();
-    t2.equal(schema.parse('123'), '123');
-    t2.equal(schema.parse(123), 123);
-    t2.equal(schema.parse(true), true);
-    t2.equal(schema.parse(null), null);
-    t2.equal(schema.parse(undefined), undefined);
-    t2.strictSame(schema.parse([]), []);
-    t2.strictSame(schema.parse({}), {});
-    t2.end();
-  });
+test('string: should parse string', (t) => {
+  const schema = S.string();
+  const parsed = schema.parse('hello');
+  t.is(parsed, 'hello');
+});
+
+test('unknown: should pass any value', (t) => {
+  const schema = S.unknown();
+  t.is(schema.parse('123'), '123');
+  t.is(schema.parse(123), 123);
+  t.is(schema.parse(true), true);
+  t.is(schema.parse(null), null);
+  t.is(schema.parse(undefined), undefined);
+  t.deepEqual(schema.parse([]), []);
+  t.deepEqual(schema.parse({}), {});
 });

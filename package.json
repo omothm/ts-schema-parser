@@ -12,8 +12,8 @@
     "ci": "npm run lint && npm run build && npm test && npm run test:acceptance",
     "lint": "eslint .",
     "prepublishOnly": "npm run build",
-    "test": "tap \"src/**/*.test.ts\"",
-    "test:acceptance": "tap \"test/acceptance/**/*.test.ts\" --no-coverage"
+    "test": "c8 --100 ava \"src/**/*.test.ts\"",
+    "test:acceptance": "ava \"test/acceptance/**/*.test.ts\""
   },
   "repository": {
     "type": "git",
@@ -42,15 +42,23 @@
   "tap": {
     "ts": true
   },
+  "ava": {
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register/transpile-only"
+    ]
+  },
   "devDependencies": {
-    "@types/tap": "^15.0.7",
     "@typescript-eslint/eslint-plugin": "^5.9.1",
     "@typescript-eslint/parser": "^5.9.1",
+    "ava": "^5.1.0",
+    "c8": "^7.12.0",
     "eslint": "^8.6.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-prettier": "^4.2.1",
-    "tap": "^16.3.0",
     "ts-node": "^10.9.1",
     "typescript": "^4.5.4"
   }
