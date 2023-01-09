@@ -195,6 +195,23 @@ test('object: should parse object with required and optional props', (t) => {
   t.deepEqual(parsed, { title: '123', body: 'hello' });
 });
 
+test('or: should throw on unexpected value', (t) => {
+  const schema = S.string().or(S.number());
+  t.true(t.throws(() => schema.parse(true)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse(null)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse(undefined)) instanceof TypeError);
+  t.true(t.throws(() => schema.parse([])) instanceof TypeError);
+  t.true(t.throws(() => schema.parse({})) instanceof TypeError);
+});
+
+test('or: should parse expected value', (t) => {
+  const schema = S.string().or(S.number());
+  const parsed1 = schema.parse('123');
+  t.is(parsed1, '123');
+  const parsed2 = schema.parse(123);
+  t.is(parsed2, 123);
+});
+
 test('partial: should throw on non-object value', (t) => {
   const obj = S.object();
   const schema = S.partial(obj);

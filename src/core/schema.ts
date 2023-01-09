@@ -51,6 +51,9 @@ export abstract class SchemaType<T = unknown> {
   /** We don't need any actual value set on this property, we use it solely for type tracking. */
   readonly _type!: T;
   abstract parse(obj: unknown): T;
+  or<S extends SchemaType>(s: S): UnionType<this, S> {
+    return new UnionType(this, s);
+  }
 }
 
 class ArrayType<T extends SchemaType> extends SchemaType<Array<Infer<T>>> {
@@ -183,6 +186,26 @@ class StringType extends SchemaType<string> {
       throw new TypeError();
     }
     return obj;
+  }
+}
+
+class UnionType<S extends SchemaType, T extends SchemaType> extends SchemaType<
+  Infer<S> | Infer<T>
+> {
+  constructor(private s: S, private t: T) {
+    super();
+  }
+
+  parse(obj: unknown): Infer<S> | Infer<T> {
+    try {
+      return this.s.parse(obj);
+    } catch {
+      try {
+        return this.t.parse(obj);
+      } catch {
+        throw new TypeError('Object type not in given union');
+      }
+    }
   }
 }
 
